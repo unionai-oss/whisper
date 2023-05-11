@@ -1,1 +1,1 @@
-# Whisper JAX on Flyte
+# Whisper on Flyte
