@@ -1,4 +1,5 @@
 import json
+import os
 
 import numpy as np
 import requests
@@ -7,6 +8,8 @@ from flytekit import Resources, task, workflow
 from flytekit.types.file import FlyteFile
 from transformers import pipeline
 from transformers.pipelines.audio_utils import ffmpeg_read
+
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
 
 
 @task(requests=Resources(gpu="1", mem="15Gi", cpu="2"))
@@ -28,8 +31,6 @@ def torch_transcribe(
     if local_audio_path.startswith("http://") or local_audio_path.startswith(
         "https://"
     ):
-        # We need to actually check for a real protocol, otherwise it's impossible to use a local file
-        # like http_huggingface_co.png
         inputs = requests.get(inputs).content
     else:
         with open(local_audio_path, "rb") as f:
@@ -55,9 +56,9 @@ def torch_transcribe(
 @workflow
 def torch_wf(
     checkpoint: str = "openai/whisper-large-v2",
-    audio: FlyteFile = "https://datasets-server.huggingface.co/assets/librispeech_asr/--/all/train.clean.100/1/audio/audio.mp3",
+    audio: FlyteFile = "https://huggingface.co/datasets/Samhita/whisper-jax-examples/resolve/main/Khloe%20Kardashian%20ON%20The%20Importance%20Of%20Putting%20Yourself%20First%20%26%20Making%20Kindness%20The%20New%20Norm.mp3",
     chunk_length: float = 30.0,
-    batch_size: int = 16,
+    batch_size: int = 8,
     return_timestamps: bool = False,
 ) -> str:
     return torch_transcribe(

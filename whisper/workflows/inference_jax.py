@@ -222,9 +222,7 @@ def forward(
     checkpoint: str,
 ) -> List[np.ndarray]:
     model, params = FlaxWhisperForConditionalGeneration.from_pretrained(
-        checkpoint,
-        _do_init=False,
-        dtype=jnp.float16,
+        checkpoint, _do_init=False, dtype=jnp.float16, cache_dir="whisper-models"
     )
 
     max_length = model.generation_config.max_length if max_length == 0 else max_length
@@ -266,7 +264,7 @@ def forward(
     return [out["tokens"], np.array(out["stride"])]
 
 
-@task(requests=Resources(mem="5Gi", cpu="2", gpu="2"))
+@task(requests=Resources(mem="5Gi", cpu="2", gpu="1"))
 def postprocess(
     model_outputs: List[List[np.ndarray]],
     chunk_length: int,
@@ -301,7 +299,7 @@ def postprocess(
     return json.dumps({"text": text, **optional})
 
 
-@dynamic(requests=Resources(mem="10Gi", cpu="4", gpu="2"))
+@dynamic(requests=Resources(mem="10Gi", cpu="4", gpu="1"))
 def jax_batch_inference(
     audios: List[FlyteFile],
     checkpoint: str,
@@ -347,7 +345,7 @@ def jax_batch_inference(
         )
         model_outputs = map_task(map_task_partial)(
             model_inputs=dataloader_to_list
-        ).with_overrides(requests=Resources(mem="30Gi", cpu="2", gpu="2"))
+        ).with_overrides(requests=Resources(mem="20Gi", cpu="2", gpu="1"))
 
         transcriptions.append(
             postprocess(

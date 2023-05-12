@@ -1,3 +1,4 @@
 .python-version
 flyte-package.tgz
 __pycache__/
+whisper-models

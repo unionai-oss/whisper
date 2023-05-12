@@ -1,5 +1,4 @@
 import json
-from typing import Optional
 
 import jax.numpy as jnp
 from flytekit import Resources, task, workflow
@@ -12,12 +11,12 @@ from whisper_jax import FlaxWhisperPipline
 )
 def jax_transcribe(
     audio: FlyteFile,
-    chunk_length_s: Optional[float],
-    stride_length_s: Optional[float],
-    batch_size: Optional[int],
-    language: Optional[str],
-    task: Optional[str],
-    return_timestamps: Optional[bool],
+    chunk_length_s: float,
+    stride_length_s: float,
+    batch_size: int,
+    language: str,
+    task: str,
+    return_timestamps: bool,
     checkpoint: str,
 ) -> str:
     pipeline = FlaxWhisperPipline(checkpoint, dtype=jnp.float16, batch_size=16)
@@ -36,14 +35,14 @@ def jax_transcribe(
 
 @workflow
 def jax_simple_wf(
-    audio: FlyteFile = "https://datasets-server.huggingface.co/assets/librispeech_asr/--/all/train.clean.100/1/audio/audio.mp3",
-    chunk_length_s: Optional[float] = None,
-    stride_length_s: Optional[float] = None,
-    batch_size: Optional[int] = None,
-    language: Optional[str] = None,
-    task: Optional[str] = None,
-    return_timestamps: Optional[bool] = None,
+    audio: FlyteFile = "https://huggingface.co/datasets/Samhita/whisper-jax-examples/resolve/main/Khloe%20Kardashian%20ON%20The%20Importance%20Of%20Putting%20Yourself%20First%20%26%20Making%20Kindness%20The%20New%20Norm.mp3",
     checkpoint: str = "openai/whisper-large-v2",
+    chunk_length_s: float = 30.0,
+    stride_length_s: float = 5.0,
+    batch_size: int = 8,
+    language: str = "en",
+    task: str = "transcribe",
+    return_timestamps: bool = False,
 ):
     return jax_transcribe(
         audio=audio,
