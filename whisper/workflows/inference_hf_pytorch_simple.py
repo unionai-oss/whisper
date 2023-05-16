@@ -56,7 +56,7 @@ def torch_transcribe(
 @workflow
 def torch_wf(
     checkpoint: str = "openai/whisper-large-v2",
-    audio: FlyteFile = "https://huggingface.co/datasets/Samhita/whisper-jax-examples/resolve/main/Khloe%20Kardashian%20ON%20The%20Importance%20Of%20Putting%20Yourself%20First%20%26%20Making%20Kindness%20The%20New%20Norm.mp3",
+    audio: FlyteFile = "https://huggingface.co/datasets/Samhita/whisper-jax-examples/resolve/main/khloe_kardashian_podcast.mp3",
     chunk_length: float = 30.0,
     batch_size: int = 8,
     return_timestamps: bool = False,

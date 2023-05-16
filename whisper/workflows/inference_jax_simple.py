@@ -19,7 +19,7 @@ def jax_transcribe(
     return_timestamps: bool,
     checkpoint: str,
 ) -> str:
-    pipeline = FlaxWhisperPipline(checkpoint, dtype=jnp.float16, batch_size=16)
+    pipeline = FlaxWhisperPipline(checkpoint, dtype=jnp.float16, batch_size=batch_size)
     return json.dumps(
         pipeline(
             audio.download(),
@@ -35,15 +35,15 @@ def jax_transcribe(
 
 @workflow
 def jax_simple_wf(
-    audio: FlyteFile = "https://huggingface.co/datasets/Samhita/whisper-jax-examples/resolve/main/Khloe%20Kardashian%20ON%20The%20Importance%20Of%20Putting%20Yourself%20First%20%26%20Making%20Kindness%20The%20New%20Norm.mp3",
+    audio: FlyteFile = "https://huggingface.co/datasets/Samhita/whisper-jax-examples/resolve/main/khloe_kardashian_podcast.mp3",
     checkpoint: str = "openai/whisper-large-v2",
     chunk_length_s: float = 30.0,
     stride_length_s: float = 5.0,
-    batch_size: int = 8,
+    batch_size: int = 16,
     language: str = "en",
     task: str = "transcribe",
     return_timestamps: bool = False,
-):
+) -> str:
     return jax_transcribe(
         audio=audio,
         chunk_length_s=chunk_length_s,
